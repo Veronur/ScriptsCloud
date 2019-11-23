@@ -38,7 +38,7 @@ def geraKeyPair():
         #os.chmod("Aps3Delch.pem", 400)
     return response
 
-def createSecurityGroup():
+def createSecurityGroup(Redirect):
     response = ec2.describe_vpcs()
     vpc_id = response.get('Vpcs', [{}])[0].get('VpcId', '')
     try:
@@ -50,20 +50,43 @@ def createSecurityGroup():
 
     k=0
     for i in SG: 
-        if i['GroupName']=='APS_Delch':
+        if i['GroupName']=='APS_Delch' or i['GroupName']=='APS_DelchR':
             try:
                 response = ec2.delete_security_group(GroupName='APS_Delch')
                 #print('Security Group Deleted')
             except ClientError as e:
                 #print("1")
-                print(e)    
+                print(e)  
+           try:
+                response = ec2.delete_security_group(GroupName='APS_DelchR')
+                #print('Security Group Deleted')
+            except ClientError as e:
+                #print("1")
+                print(e)  
+                
             try:
                 response = ec2.create_security_group(GroupName='APS_Delch',
                                                     Description='Security group da APS',
                                                     VpcId=vpc_id)
+                responseR = ec2.create_security_group(GroupName='APS_DelchR',
+                                                    Description='Security group da APS',
+                                                    VpcId=vpc_id)
                 security_group_id = response['GroupId']
+                security_group_idR = responseR['GroupId']
                 #print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
                 #print('antes')
+                data = ec2.authorize_security_group_ingress(
+                    GroupId=security_group_idDB,
+                    IpPermissions=[
+                        {'IpProtocol': 'tcp',
+                        'FromPort': 5000,
+                        'ToPort': 5000,
+                        'IpRanges': [{'CidrIp':'{}/32'.format(Redirect['PublicIp'])}]},  
+                        {'IpProtocol': 'tcp',
+                        'FromPort': 22,
+                        'ToPort': 22,
+                        'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}                     
+                    ])
                 data = ec2.authorize_security_group_ingress(
                     GroupId=security_group_id,
                     IpPermissions=[
@@ -88,9 +111,25 @@ def createSecurityGroup():
                 response = ec2.create_security_group(GroupName='APS_Delch',
                                                     Description='Security group da APS',
                                                     VpcId=vpc_id)
+                responseR = ec2.create_security_group(GroupName='APS_DelchR',
+                                                    Description='Security group da APS',
+                                                    VpcId=vpc_id)
                 security_group_id = response['GroupId']
+                security_group_idR = responseR['GroupId']
                 #print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
-
+                #print('antes')
+                data = ec2.authorize_security_group_ingress(
+                    GroupId=security_group_idDB,
+                    IpPermissions=[
+                        {'IpProtocol': 'tcp',
+                        'FromPort': 5000,
+                        'ToPort': 5000,
+                        'IpRanges': [{'CidrIp':'{}/32'.format(Redirect['PublicIp'])}]},  
+                        {'IpProtocol': 'tcp',
+                        'FromPort': 22,
+                        'ToPort': 22,
+                        'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}                     
+                    ])
                 data = ec2.authorize_security_group_ingress(
                     GroupId=security_group_id,
                     IpPermissions=[
@@ -103,15 +142,19 @@ def createSecurityGroup():
                         'ToPort': 22,
                         'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
                     ])
+                #print('depois')
                 #print('Ingress Successfully Set %s' % data)
             except ClientError as e:
-                print(e)    
-    return response
+                #print('3')
+                print(e)   
+    return [response, responceR]
 
-
+ipDel=[]
 for i in instancia['Reservations']:
     for j in i['Instances']:
         idDelete.append(j['InstanceId'])
+        for k in j['NetworkInterfaces']:
+            ipDelete.append(k['Association']['PublicIp'])
 
 if (len(idDelete)!= 0):
 
@@ -119,7 +162,11 @@ if (len(idDelete)!= 0):
 
     waiter = ec2.get_waiter('instance_terminated')
     waiter.wait(InstanceIds=idDelete)
+decribeIP=ec2.describe_addresses(PublicIps=ipDelete)
 
+for i in decribeIP['Addresses']:
+    response = ec2.release_address(AllocationId=i['AllocationId'])
+allocation = ec2.allocate_address()
 
 lB= boto3.client('elbv2')
 aS = boto3.client('autoscaling')
@@ -172,9 +219,10 @@ while(True):
 
 print("\nLixo deletado")
 KeyPair = geraKeyPair()
-SecurityGroup = createSecurityGroup()
+SecurityGroup = createSecurityGroup(allocation)
 #print(SecurityGroup)
-sgid=SecurityGroup['GroupId']
+sgid=SecurityGroup[0]['GroupId']
+sgid=SecurityGroupR[1]['GroupId']
 defaultSGid  = ec2.describe_security_groups(GroupNames=['default'])
 defaultSGid = defaultSGid['SecurityGroups'][0]['GroupId']
 user_data_script = '''#!/bin/bash
@@ -190,6 +238,32 @@ echo "python3 serverFlask.py" >> /etc/rc.local
 echo "exit 0" >> /etc/rc.local
 chmod +x /etc/rc.local
 sudo reboot'''
+
+user_data_scriptR = '''#!/bin/bash
+'''
+instanceR = ec2.run_instances(
+    ImageId='ami-0d5d9d301c853a04a',
+    InstanceType='t2.micro',
+    KeyName='Aps3Delch',
+    MaxCount=1,
+    MinCount=1,
+    SecurityGroupIds=[sgidR,defaultSGid],
+    UserData=user_data_scriptR,
+    TagSpecifications=[
+        {
+            'ResourceType':'instance',
+            'Tags': [
+                {
+                    'Key': 'Owner',
+                    'Value':'Lucca Delchairo Costabile'
+                },
+                {
+                    'Key': 'Name',
+                    'Value':'RedirectDelch'
+                }
+            ]
+        }   
+    ])
 
 ec2i = boto3.client('ec2',region_name='us-east-1')
 instance = ec2i.run_instances(
