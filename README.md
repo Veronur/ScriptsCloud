@@ -1,6 +1,10 @@
 # ScriptsCloud
 
 # Para rodar o script:
+rode o $aws configure
+<br />
+isira as credenciais, escolha a regiao us-east-1 e o output format json
+<br />
 entrar no super user ($su/$sudo su) 
 <br />
 rodar Python3 script.py
