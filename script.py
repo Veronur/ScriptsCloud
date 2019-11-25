@@ -480,14 +480,14 @@ chmod +x /etc/rc.local
 python3 /home/ubuntu/DatabaseCloud/setup.py {1}
 '''.format(DBIP,DBIP)
 
-instanceR = ec2_1.run_instances(
-    ImageId='ami-04b9e92b5572fa0d1',
+instanceDB = ec2_2.run_instances(
+    ImageId='ami-0d5d9d301c853a04a',
     InstanceType='t2.micro',
-    KeyName='ProgDelch_1',
+    KeyName='ProgDelch_2',
     MaxCount=1,
     MinCount=1,
-    SecurityGroupIds=[sgidR,defaultSGid_1],
-    UserData=user_data_scriptR,
+    SecurityGroupIds=[sgidDB,defaultSGid_2],
+    UserData=user_data_scriptDB,
     TagSpecifications=[
         {
             'ResourceType':'instance',
@@ -498,11 +498,14 @@ instanceR = ec2_1.run_instances(
                 },
                 {
                     'Key': 'Name',
-                    'Value':'RedirectDelch'
+                    'Value':'DataBaseDelch'
                 }
             ]
         }   
     ])
+
+waiter = ec2_2.get_waiter('instance_running')
+waiter.wait(InstanceIds=[instanceDB['Instances'][0]['InstanceId']])
 
 instanceWS = ec2_2.run_instances(
     ImageId='ami-0d5d9d301c853a04a',
@@ -529,14 +532,15 @@ instanceWS = ec2_2.run_instances(
     ])
 
 
-instanceDB = ec2_2.run_instances(
-    ImageId='ami-0d5d9d301c853a04a',
+
+instanceR = ec2_1.run_instances(
+    ImageId='ami-04b9e92b5572fa0d1',
     InstanceType='t2.micro',
-    KeyName='ProgDelch_2',
+    KeyName='ProgDelch_1',
     MaxCount=1,
     MinCount=1,
-    SecurityGroupIds=[sgidDB,defaultSGid_2],
-    UserData=user_data_scriptDB,
+    SecurityGroupIds=[sgidR,defaultSGid_1],
+    UserData=user_data_scriptR,
     TagSpecifications=[
         {
             'ResourceType':'instance',
@@ -547,14 +551,15 @@ instanceDB = ec2_2.run_instances(
                 },
                 {
                     'Key': 'Name',
-                    'Value':'DataBaseDelch'
+                    'Value':'RedirectDelch'
                 }
             ]
         }   
     ])
 
+
 waiter = ec2_2.get_waiter('instance_running')
-waiter.wait(InstanceIds=[instanceDB['Instances'][0]['InstanceId'],instanceWS['Instances'][0]['InstanceId']])
+waiter.wait(InstanceIds=[instanceWS['Instances'][0]['InstanceId']])
 waiter = ec2_1.get_waiter('instance_running')
 waiter.wait(InstanceIds=[instanceR['Instances'][0]['InstanceId']])
 
