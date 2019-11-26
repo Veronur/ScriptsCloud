@@ -1,6 +1,8 @@
 # ScriptsCloud
 
 # Para rodar o script:
+execute o comando $pip3 install boto3 , para intalar a biblioteca
+<br />
 rode o $aws configure
 <br />
 isira as credenciais, escolha a regiao us-east-1 e o output format json
