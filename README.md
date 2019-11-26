@@ -1,17 +1,19 @@
 # ScriptsCloud
 
 # Para rodar o script:
-execute o comando $pip3 install boto3 , para intalar a biblioteca
+Execute o comando $pip3 install boto3 , para intalar a biblioteca
 <br />
-rode o $aws configure
+Rode o $aws configure
 <br />
-isira as credenciais, escolha a regiao us-east-1 e o output format json
+Isira as credenciais, escolha a regiao us-east-1 e o output format json
 <br />
-entrar no super user ($su/$sudo su) 
+Entrar no super user ($su/$sudo su) 
 <br />
-rodar Python3 script.py
+Rodar Python3 script.py
 
 # Para Testar:
+Intale a biblioteca requests com $pip3 install requests
+<br />
 $teste (funct) (id)
 <br />
 id-opicional
