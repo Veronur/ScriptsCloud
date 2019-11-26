@@ -16,10 +16,12 @@ Intale a biblioteca requests com $pip3 install requests
 <br />
 $teste (funct) (nome)
 <br />
-nome-opicional
 
-
-funct: add, list, delete
+Argumentos:
+<br />
+nome-opicional: nome da tarefa
+<br />
+funct: função que se deseja executar.(add, list, delete)
 <br />
 add(nome): adiciona uma tarefa
 <br />
@@ -29,7 +31,7 @@ list():lista todas as tarefas
 <br />
 delete(nome): deleta uma tarefa
 <br />
-    nome: nome da tarefa a ser deletada
+   nome: nome da tarefa a ser deletada
 <br />
 
 
