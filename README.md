@@ -20,20 +20,21 @@ $teste (funct) (nome)
 Argumentos:
 <br />
 <br />
-nome: nome da tarefa
+-nome: nome da tarefa
 <br />
 <br />
-funct: função que se deseja executar.(add, list, delete)
+-funct: função que se deseja executar.(add, list, delete)
 <br />
---add(nome): adiciona uma tarefa
 <br />
- -nome: Nome da tarefa
+---add(nome): adiciona uma tarefa
 <br />
---list():lista todas as tarefas
+--nome: Nome da tarefa
 <br />
---delete(nome): deleta uma tarefa
+---list():lista todas as tarefas
 <br />
- -nome: nome da tarefa a ser deletada
+---delete(nome): deleta uma tarefa
+<br />
+--nome: nome da tarefa a ser deletada
 <br />
 
 
