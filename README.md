@@ -14,9 +14,9 @@ Rodar Python3 script.py
 # Para Testar:
 Intale a biblioteca requests com $pip3 install requests
 <br />
-$teste (funct) (id)
+$teste (funct) (nome)
 <br />
-id-opicional
+nome-opicional
 
 
 funct: add, list, delete
@@ -27,9 +27,9 @@ add(nome): adiciona uma tarefa
 <br />
 list():lista todas as tarefas
 <br />
-delete(id): deleta uma tarefa
+delete(nome): deleta uma tarefa
 <br />
-    id: id da tarefa a ser deletada
+    nome: nome da tarefa a ser deletada
 <br />
 
 
