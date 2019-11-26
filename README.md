@@ -5,7 +5,7 @@ Execute o comando $pip3 install boto3 , para intalar a biblioteca
 <br />
 Rode o $aws configure
 <br />
-Isira as credenciais, escolha a regiao us-east-1 e o output format json
+Insira as credenciais, a regiao us-east-1 e o output format json
 <br />
 Entrar no super user ($su/$sudo su) 
 <br />
@@ -33,4 +33,4 @@ delete(id): deleta uma tarefa
 <br />
 
 
-O script ira pedir o ip do WebServer
+O script de teste ira pedir o ip do WebServer
